@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello my venus</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; overflow: hidden; }
+        
+        /* --- DASHBOARD HOME SCREEN --- */
+        #home-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; width: 100vw; position: absolute; background: linear-gradient(135deg, #fdfbfb, #ebedee); transition: 0.5s; z-index: 10; }
+        .cartoon-avatar { width: 150px; animation: float 3s infinite; margin-bottom: 10px; }
+        .title { font-size: 50px; color: #8e44ad; margin: 0; margin-bottom: 30px;}
+        
+        .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 800px; }
+        .app-card { background: white; padding: 25px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; }
+        .app-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(142,68,173,0.3); }
+        .app-card h3 { color: #2c3e50; margin-bottom: 5px; font-size: 22px;}
+        .app-card p { color: #7f8c8d; font-size: 14px; margin: 0;}
+        .app-icon { font-size: 40px; margin-bottom: 10px; }
+
+        /* --- APP SCREENS (Hidden by default) --- */
+        .app-screen { display: none; height: 100vh; width: 100vw; position: absolute; background: white; transition: 0.5s; opacity: 0; transform: scale(0.95); z-index: 5; flex-direction: column; }
+        .app-header { display: flex; align-items: center; padding: 15px 20px; background: #8e44ad; color: white; gap: 20px; }
+        .btn-back { padding: 8px 15px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 20px; cursor: pointer; }
+        .btn-back:hover { background: rgba(255,255,255,0.4); }
+        
+        .app-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: #fafafa; }
+        .simple-box { width: 60%; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; }
+        textarea { width: 100%; height: 150px; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; outline: none; margin-bottom: 15px; resize: none;}
+        .action-btn { padding: 12px 25px; border: none; border-radius: 30px; cursor: pointer; color: white; font-weight: bold; font-size: 16px;}
+        
+        /* CHAT SCREEN SPECIFICS (Keep existing layout) */
+        #chat-screen { flex-direction: row; }
+        .sidebar { width: 320px; background: #2c3e50; color: white; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
+        .sidebar h2 { font-size: 18px; margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        .btn-clear-all { background: #c0392b; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        .history-wrapper { display: flex; align-items: center; gap: 5px; margin-bottom: 10px; }
+        .history-item { flex: 1; padding: 10px; background: #34495e; border-radius: 5px; font-size: 14px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .btn-action-history { border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        .btn-edit { background: #f39c12; color: white; }
+        .btn-del { background: #ff4757; color: white; }
+        
+        .main-chat { flex: 1; display: flex; flex-direction: column; }
+        .chat-box { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 15px; }
+        .message-row { display: flex; align-items: flex-end; gap: 10px; max-width: 80%; }
+        .row-user { align-self: flex-end; flex-direction: row-reverse; }
+        .row-bot { align-self: flex-start; }
+        .avatar { font-size: 30px; }
+        .message { padding: 15px 20px; border-radius: 20px; font-size: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .user-msg { background: #007bff; color: white; border-bottom-right-radius: 5px; }
+        .bot-msg { background: #e9ecef; color: #333; border-bottom-left-radius: 5px; }
+
+        .input-wrapper { display: flex; flex-direction: column; background: white; border-top: 1px solid #ddd; padding: 15px 20px; }
+        .input-container { display: flex; gap: 10px; }
+        input[type="text"] { flex: 1; padding: 15px; border: 2px solid #eee; border-radius: 30px; outline: none; }
+        .btn-send { background: #28a745; }
+        .btn-mic { background: #17a2b8; width: 120px;}
+
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 100; }
+        .modal-content { background: white; padding: 25px; border-radius: 15px; width: 350px; text-align: center; }
+        .modal-content input { width: 90%; padding: 10px; margin: 15px 0; border: 2px solid #ddd; border-radius: 8px; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; color: white; cursor: pointer;}
+        .btn-cancel { background: #95a5a6; }
+        .btn-save { background: #27ae60; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+    </style>
+</head>
+<body>
+
+<!-- DASHBOARD HOME SCREEN -->
+<div id="home-screen">
+    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Venus&backgroundColor=f0f2f5" class="cartoon-avatar">
+    <h1 class="title">Hello my venus</h1>
+    
+    <div class="app-grid">
+        <div class="app-card" onclick="openApp('chat-screen')">
+            <div class="app-icon">🤖</div>
+            <h3>Smart Local AI</h3>
+            <p>Chat and talk with Venus</p>
+        </div>
+        <div class="app-card" onclick="openApp('tts-screen')">
+            <div class="app-icon">🔊</div>
+            <h3>Text to Speech</h3>
+            <p>Type text and hear it spoken</p>
+        </div>
+        <div class="app-card" onclick="openApp('stt-screen')">
+            <div class="app-icon">🎤</div>
+            <h3>Speech to Text</h3>
+            <p>Speak to convert voice to text</p>
+        </div>
+        <div class="app-card" onclick="openApp('file-screen')">
+            <div class="app-icon">📄</div>
+            <h3>File Reader</h3>
+            <p>Convert PDF/Text files to speech</p>
+        </div>
+    </div>
+</div>
+
+<!-- APP 1: CHAT SCREEN (Existing) -->
+<div id="chat-screen" class="app-screen">
+    <div class="sidebar">
+        <h2><span>📜 Old Chats</span> <button class="btn-clear-all" onclick="clearAllHistory()">🗑️ Clear</button></h2>
+        <div id="history-list"></div>
+    </div>
+    <div class="main-chat">
+        <div class="app-header">
+            <button class="btn-back" onclick="goHome()">⬅️ Home</button>
+            <button class="btn-back" style="background:#27ae60;" onclick="startNewChat()">➕ New Chat</button>
+            <h2 style="margin:0; flex:1; text-align:center;">Venus AI</h2>
+            <button class="action-btn" style="background:#ff4757; padding:8px 15px;" onclick="stopAudio()">🔇 Stop</button>
+        </div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="input-wrapper">
+            <div id="listening-status" style="color:red; display:none;">🎙️ Listening...</div>
+            <div class="input-container">
+                <button class="action-btn btn-mic" id="btn-mic" onclick="toggleDictation()">🎤 Speak</button>
+                <input type="text" id="user-input" placeholder="Type or speak..." onkeypress="if(event.key === 'Enter') sendText()">
+                <button class="action-btn btn-send" onclick="sendText()">➤ Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- APP 2: TEXT TO SPEECH -->
+<div id="tts-screen" class="app-screen">
+    <div class="app-header">
+        <button class="btn-back" onclick="goHome()">⬅️ Home</button>
+        <h2 style="margin:0;">Text to Speech</h2>
+    </div>
+    <div class="app-body">
+        <div class="simple-box">
+            <h2>Type something to hear it</h2>
+            <textarea id="tts-input" placeholder="Enter text here..."></textarea>
+            <br>
+            <button class="action-btn btn-send" onclick="playTTS()">▶️ Play Audio</button>
+            <button class="action-btn" style="background:#ff4757;" onclick="stopAudio()">🛑 Stop</button>
+        </div>
+    </div>
+</div>
+
+<!-- APP 3: SPEECH TO TEXT -->
+<div id="stt-screen" class="app-screen">
+    <div class="app-header">
+        <button class="btn-back" onclick="goHome()">⬅️ Home</button>
+        <h2 style="margin:0;">Speech to Text</h2>
+    </div>
+    <div class="app-body">
+        <div class="simple-box">
+            <h2>Speak to see your text</h2>
+            <textarea id="stt-output" placeholder="Your voice will appear here..." readonly></textarea>
+            <br>
+            <button class="action-btn btn-mic" id="btn-stt-mic" onclick="toggleSTT()">🎤 Start Listening</button>
+        </div>
+    </div>
+</div>
+
+<!-- APP 4: FILE READER -->
+<div id="file-screen" class="app-screen">
+    <div class="app-header">
+        <button class="btn-back" onclick="goHome()">⬅️ Home</button>
+        <h2 style="margin:0;">File Reader (PDF/Text)</h2>
+    </div>
+    <div class="app-body">
+        <div class="simple-box" style="width: 80%;">
+            <h2>Upload a document</h2>
+            <input type="file" id="file-input" accept=".txt,.pdf" style="margin-bottom:10px; font-size:16px;">
+            <br><br>
+            
+            <!-- Buttons -->
+            <button class="action-btn btn-send" id="btn-read-file" onclick="uploadAndReadFile()">▶️ Read File Out Loud</button>
+            <button class="action-btn" id="btn-stop-file" style="background:#ff4757; display:none;" onclick="stopAudio()">🛑 Stop</button>
+            
+            <!-- Loading Spinner -->
+            <div id="file-loading" style="display:none; margin-top: 25px;">
+                <div class="spinner"></div>
+                <p style="color:#8e44ad; font-weight:bold; font-size: 18px;">Reading file... please wait ⏳</p>
+            </div>
+
+            <!-- Output Text Area -->
+            <textarea id="file-output" placeholder="File text will appear here..." readonly style="margin-top:20px; display:none; height: 250px;"></textarea>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="edit-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Edit Chat Name</h3>
+        <input type="text" id="edit-modal-input" placeholder="Enter new name...">
+        <div class="modal-buttons">
+            <button class="modal-btn btn-cancel" onclick="closeEditModal()">Cancel</button>
+            <button class="modal-btn btn-save" onclick="saveEditedName()">Save</button>
+        </div>
+    </div>
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
